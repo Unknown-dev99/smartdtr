@@ -20,10 +20,15 @@ class AuthController extends Controller
 
     public function login(Request $request): RedirectResponse
     {
-        $credentials = $request->validate([
+        $validated = $request->validate([
             'username' => 'required|string',
             'password' => 'required|string',
         ]);
+
+        // The login box accepts either the username or the account email.
+        $login = trim($validated['username']);
+        $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $credentials = [$field => $login, 'password' => $validated['password']];
 
         if (Auth::guard('admin')->attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();

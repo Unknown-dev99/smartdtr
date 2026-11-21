@@ -17,12 +17,12 @@
         <form method="POST" action="{{ route('login') }}" class="space-y-5">
             @csrf
             <div class="form-group">
-                <label class="form-label">Username</label>
-                <input type="text" name="username" value="{{ old('username') }}" required autofocus class="form-input" placeholder="Enter username">
+                <label class="form-label">Username or email</label>
+                <input type="text" name="username" value="{{ old('username') }}" required autofocus autocomplete="username" class="form-input" placeholder="Enter username or email">
             </div>
             <div class="form-group">
                 <label class="form-label">Password</label>
-                <input type="password" name="password" required class="form-input" placeholder="Enter password">
+                <input type="password" name="password" required autocomplete="current-password" class="form-input" placeholder="Enter password">
             </div>
             <button type="submit" class="btn-primary w-full py-3">Sign In to Admin</button>
         </form>
