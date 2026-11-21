@@ -14,9 +14,9 @@
 <body
     class="@yield('body_class', 'app-body')"
     x-data="{
-        toast: @json(session('success') ?? session('error') ?? $errors->first() ?? ''),
-        toastType: @json(session('success') ? 'success' : ((session('error') || $errors->any()) ? 'error' : '')),
-        toastExtra: @json($errors->count() > 1 ? array_slice($errors->all(), 1) : []),
+        toast: {{ \Illuminate\Support\Js::from(session('success') ?? session('error') ?? $errors->first() ?? '') }},
+        toastType: {{ \Illuminate\Support\Js::from(session('success') ? 'success' : ((session('error') || $errors->any()) ? 'error' : '')) }},
+        toastExtra: {{ \Illuminate\Support\Js::from($errors->count() > 1 ? array_slice($errors->all(), 1) : []) }},
         confirmOpen: false,
         confirmMessage: '',
         confirmType: 'primary',
