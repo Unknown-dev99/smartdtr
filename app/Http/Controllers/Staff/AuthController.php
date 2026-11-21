@@ -7,6 +7,7 @@ use App\Models\Personnel;
 use App\Models\StaffUser;
 use App\Rules\StrongPassword;
 use App\Services\FaceSampleEnrollmentService;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -121,6 +122,15 @@ class AuthController extends Controller
 
             return $this->registrationFailed($request, [
                 $this->duplicateField($e->getMessage()) => 'This account was already registered. Please sign in instead.',
+            ]);
+        } catch (QueryException $e) {
+            // QueryException is a RuntimeException; never show raw SQL to the public.
+            DB::rollBack();
+            $this->deleteRegistrationFaces($personnelId);
+            report($e);
+
+            return $this->registrationFailed($request, [
+                'email' => 'Registration could not be saved because of a server problem. Please try again later or contact HR.',
             ]);
         } catch (RuntimeException $e) {
             DB::rollBack();

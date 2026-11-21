@@ -89,7 +89,7 @@
                 <label class="form-label">Department</label>
                 <input type="text" name="department" value="{{ old('department') }}"
                     maxlength="100"
-                    pattern="([A-Za-zÑñ]+(?:[ .&/\-][A-Za-zÑñ]+)*)?"
+                    pattern="([A-Za-zÑñ]+(?:[ .&\/\-][A-Za-zÑñ]+)*)?"
                     title="Optional. Letters only if filled."
                     data-filter="department"
                     placeholder="e.g. Science" class="form-input @error('department') form-input-error @enderror">

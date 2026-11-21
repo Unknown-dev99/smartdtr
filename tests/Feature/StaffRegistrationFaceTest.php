@@ -5,7 +5,9 @@ namespace Tests\Feature;
 use App\Models\AdminUser;
 use App\Models\Personnel;
 use App\Models\StaffUser;
+use App\Services\FaceSampleEnrollmentService;
 use App\Services\PythonFaceEnrollmentValidator;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -103,6 +105,32 @@ class StaffRegistrationFaceTest extends TestCase
         $this->assertNull($staff->fresh()->personnel_id);
         $this->assertNull(Personnel::find($personnelId));
         $this->assertSame([], Storage::disk('faces')->allFiles());
+    }
+
+    public function test_database_error_during_registration_does_not_show_sql_to_the_user(): void
+    {
+        Storage::fake('faces');
+        $this->mock(FaceSampleEnrollmentService::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('saveThreeSamples')->once()->andThrow(new QueryException(
+                'mysql',
+                'insert into `staff_users` (`email`, `password`) values (?, ?)',
+                ['juan.face@example.test', '$2y$12$secrethash'],
+                new \PDOException("SQLSTATE[HY000]: General error: 1364 Field 'id' doesn't have a default value")
+            ));
+        });
+
+        $response = $this->postJson(route('staff.register'), $this->account([
+            'images' => $this->captures(),
+            'blink_verifications' => ['1', '1', '1'],
+        ]));
+
+        $response->assertStatus(422)
+            ->assertJsonPath('ok', false)
+            ->assertJsonPath('message', 'Registration could not be saved because of a server problem. Please try again later or contact HR.');
+        $this->assertStringNotContainsString('SQLSTATE', $response->getContent());
+        $this->assertStringNotContainsString('secrethash', $response->getContent());
+        $this->assertDatabaseCount('staff_users', 0);
+        $this->assertDatabaseCount('personnel', 0);
     }
 
     /**
