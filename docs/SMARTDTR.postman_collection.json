@@ -1,0 +1,49 @@
+{
+  "info": {
+    "name": "SMARTDTR API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Attendance Scan",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"personnel_id\": 1,\n  \"date\": \"2026-04-18\",\n  \"time\": \"07:55:00\",\n  \"blink_detected\": true,\n  \"face_confidence\": 0.87\n}"
+        },
+        "url": "{{base_url}}/api/attendance/scan"
+      }
+    },
+    {
+      "name": "Admin Login",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin@123\"\n}"
+        },
+        "url": "{{base_url}}/api/auth/login"
+      }
+    },
+    {
+      "name": "List Personnel",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/admin/personnel"
+      }
+    },
+    {
+      "name": "DTR Excel Export",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/admin/reports/dtr/excel?personnel_id=1&month=2026-04"
+      }
+    }
+  ],
+  "variable": [
+    {"key": "base_url", "value": "http://localhost"}
+  ]
+}

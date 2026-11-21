@@ -1,0 +1,37 @@
+INHS SMART-DTR — school server install
+Do this on the Windows PC that stays on at school. That PC needs XAMPP (Apache, PHP 8.2, MySQL) and Microsoft Excel.
+
+1. Copy this whole folder to:
+   C:\xampp\htdocs\INHS SMART-DTR
+   Leave out node_modules and .venv-face. Include vendor, public\build, and storage\app.
+
+2. Start Apache and MySQL in the XAMPP Control Panel.
+
+3. Open http://localhost/phpmyadmin
+   - Create a database named smartdtr (utf8mb4_unicode_ci).
+   - Select that database, open Import, and choose the smartdtr SQL file from the flash drive.
+   - Do not run: php artisan migrate --seed
+     Seeding replaces the real employees with demo data.
+
+4. On the server, replace the file .env with .env.school (rename .env.school to .env).
+   Then edit APP_URL. Use the server PC's IP, for example:
+   APP_URL=http://192.168.1.50/INHS%20SMART-DTR
+   Leave APP_KEY unchanged. A new key makes every saved password stop working.
+   APP_ENV is already production and APP_DEBUG is already false.
+
+5. Open a command prompt in C:\xampp\htdocs\INHS SMART-DTR and run:
+   C:\xampp\php\php.exe artisan config:clear
+   C:\xampp\php\php.exe artisan route:clear
+   C:\xampp\php\php.exe artisan view:clear
+
+6. Allow Apache through the Windows firewall.
+   From another computer on the school Wi-Fi, open:
+   http://SERVER-IP/INHS%20SMART-DTR
+   Admin login:  /login
+   Employee login: /staff/login  (full Gmail address)
+
+7. Restart the attendance camera software so it looks for this PC, not the laptop.
+   The camera stays on the school Wi-Fi. Do not put the camera API on a public link.
+
+Employees on the same school Wi-Fi can open the employee login on their phones.
+Phones on mobile data cannot reach a 192.168 address. A Cloudflare Tunnel is a later step, after this install works inside the school.

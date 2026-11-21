@@ -1,0 +1,39 @@
+Options -Indexes +FollowSymLinks
+DirectoryIndex index.php
+
+# The site folder is the Apache document root. Refuse the private
+# application files even when they exist on disk.
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+<FilesMatch "(?i)^(artisan|composer\.(json|lock|phar)|package(-lock)?\.json|phpunit\.xml(\.dist)?|vite\.config\.js|DEPLOY-SCHOOL\.txt|README\.md)$">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteRule ^(?:app|bootstrap|config|database|resources|routes|storage|tests|vendor|node_modules|scripts|raspberry-pi)(?:/|$) - [F,L]
+
+    # Vite / Laravel build assets live under public/build/
+    RewriteRule ^build/(.*)$ public/build/$1 [L]
+    RewriteRule ^images/(.*)$ public/images/$1 [L]
+    RewriteRule ^avatars/(.*)$ public/avatars/$1 [L]
+    RewriteRule ^js/(.*)$ public/js/$1 [L]
+
+    # Serve other static files from public/ when they exist
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond public/$1 -f [OR]
+    RewriteCond public/$1 -d
+    RewriteRule ^(.+)$ public/$1 [L]
+
+    # All other requests -> Laravel front controller
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+<IfModule !mod_rewrite.c>
+    FallbackResource index.php
+</IfModule>

@@ -1,0 +1,99 @@
+openapi: 3.0.3
+info:
+  title: SMARTDTR API
+  version: 1.0.0
+  description: Smart Daily Time Record System API for DepEd SHS
+
+servers:
+  - url: http://localhost/api
+
+paths:
+  /attendance/scan:
+    post:
+      summary: Record attendance scan from Pi device
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [personnel_id, blink_detected, face_confidence]
+              properties:
+                personnel_id:
+                  type: integer
+                date:
+                  type: string
+                  format: date
+                time:
+                  type: string
+                  example: "07:55:00"
+                date_override:
+                  type: string
+                  format: date
+                blink_detected:
+                  type: boolean
+                face_confidence:
+                  type: number
+      responses:
+        '200':
+          description: Scan recorded
+        '403':
+          description: Blink not detected
+
+  /auth/login:
+    post:
+      summary: Admin login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Logged in
+
+  /admin/personnel:
+    get:
+      summary: List personnel
+      security: [{ adminSession: [] }]
+      responses:
+        '200':
+          description: Personnel list
+    post:
+      summary: Create personnel
+      security: [{ adminSession: [] }]
+      responses:
+        '201':
+          description: Created
+
+  /admin/reports/dtr/excel:
+    get:
+      summary: Download DTR Excel
+      security: [{ adminSession: [] }]
+      parameters:
+        - name: personnel_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "2026-04"
+      responses:
+        '200':
+          description: Excel file
+
+components:
+  securitySchemes:
+    adminSession:
+      type: apiKey
+      in: cookie
+      name: laravel_session
